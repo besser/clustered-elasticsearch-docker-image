@@ -36,15 +36,15 @@ RUN wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.3.
   rm -rf /tmp/elasticsearch
 
 
-# Create elasticsearch group and user
-RUN groupadd -g 1000 elasticsearch \
-  && useradd -d "$ELASTICSEARCH_HOME" -u 1000 -g 1000 -s /sbin/nologin elasticsearch
-
 # Creates directory used to store the data files
 RUN mkdir -p /var/elasticsearch/data
 
 # Creates directory used to store the log files
 RUN mkdir -p /var/elasticsearch/log
+
+# Create elasticsearch group and user
+RUN groupadd -g 1000 elasticsearch \
+  && useradd -d "$ELASTICSEARCH_HOME" -u 1000 -g 1000 -s /sbin/nologin elasticsearch
 
 # Change directories ownership to elasticsearch user and group
 RUN chown -R elasticsearch:elasticsearch $ELASTICSEARCH_HOME /var/data/elasticsearch /var/log/elasticsearch
@@ -53,7 +53,7 @@ RUN chown -R elasticsearch:elasticsearch $ELASTICSEARCH_HOME /var/data/elasticse
 USER elasticsearch
 
 # Install Elasticsearch monitoring plugins
-RUN ./bin/plugin install mobz/elasticsearch-head && ./bin/plugin install royrusso/elasticsearch-HQ
+RUN ./opt/elasticsearch/bin/plugin install mobz/elasticsearch-head && ./opt/elasticsearch/bin/plugin install royrusso/elasticsearch-HQ
 
 # Exposes http ports
 EXPOSE 9200 9300
