@@ -32,28 +32,30 @@ RUN apt-get update && \
 
 RUN wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.3.0.tar.gz -P /tmp/elasticsearch && \
   tar -xvzf /tmp/elasticsearch/elasticsearch-5.3.0.tar.gz -C /tmp/elasticsearch && \
+  rm -rf /tmp/elasticsearch/elasticsearch-5.3.0.tar.gz && \
   mv /tmp/elasticsearch/elasticsearch-5.3.0 $ELASTICSEARCH_HOME && \
   rm -rf /tmp/elasticsearch
 
-
 # Creates directory used to store the data files
-RUN mkdir -p /var/elasticsearch/data
+RUN mkdir -p /var/data/elasticsearch
 
 # Creates directory used to store the log files
-RUN mkdir -p /var/elasticsearch/log
+RUN mkdir -p /var/log/elasticsearch
 
 # Create elasticsearch group and user
 RUN groupadd -g 1000 elasticsearch \
   && useradd -d "$ELASTICSEARCH_HOME" -u 1000 -g 1000 -s /sbin/nologin elasticsearch
 
 # Change directories ownership to elasticsearch user and group
-RUN chown -R elasticsearch:elasticsearch $ELASTICSEARCH_HOME /var/data/elasticsearch /var/log/elasticsearch
+RUN chown -R elasticsearch:elasticsearch $ELASTICSEARCH_HOME /var/log/elasticsearch /var/data/elasticsearch
 
 # Run the container as elasticsearch user
 USER elasticsearch
 
+WORKDIR "$ELASTICSEARCH_HOME"
+
 # Install Elasticsearch monitoring plugins
-RUN ./opt/elasticsearch/bin/plugin install mobz/elasticsearch-head && ./opt/elasticsearch/bin/plugin install royrusso/elasticsearch-HQ
+RUN ./bin/elasticsearch-plugin install x-pack
 
 # Exposes http ports
 EXPOSE 9200 9300
