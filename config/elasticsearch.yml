@@ -16,8 +16,10 @@ path.logs: /var/log/elasticsearch
 bootstrap.memory_lock: LOCK_MEMORY
 
 # ---------------------------------- Network -----------------------------------
-network.host: NETWORK_HOST
+#network.host: NETWORK_HOST
+network.host: 0.0.0.0
 
 # --------------------------------- Discovery ----------------------------------
 #discovery.zen.ping.unicast.hosts: UNICAST_HOSTS
 #discovery.zen.minimum_master_nodes: MINIMUM_MASTER_NODES
+discovery.zen.minimum_master_nodes: 1
