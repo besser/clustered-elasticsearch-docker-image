@@ -1,13 +1,25 @@
 
-docker kill (docker ps -a -q)
+docker kill $(docker ps -a -q)
+docker rm $(docker ps -a -q)
 
-docker rm (docker ps -a -q)
+docker build -t godois/elasticsearch-clustered:1.0 .
 
-docker run -d -it --name elasticsearch -p 9200:9200 -p 9300:9300 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" godois/elasticsearch-clustered:1.0
-
-docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:5.3.0
+docker run -d -it --name elasticsearch \
+    -p 9200:9200 -p 9300:9300 \
+    -e "http.host=0.0.0.0" \
+    -e "transport.host=127.0.0.1" \
+    -e CLUSTER_NAME=sage-content \
+    -e NODE_NAME=sage-content-node1 \
+    -e IS_MASTER_ELEGIBLE_NODE=yes \
+    -e IS_DATA_NODE=yes \
+    -e LOCK_MEMORY=true \
+    -e NETWORK_HOST=127.0.0.1 \
+    godois/elasticsearch-clustered:1.0
 
 docker exec -i -t  elasticsearch /bin/bash
+
+
+docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:5.3.0
 
 docker exec -i -t 1df8d39da4c5 /bin/bash
 
