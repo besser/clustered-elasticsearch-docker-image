@@ -13,11 +13,11 @@ path.data: /var/data/elasticsearch
 path.logs: /var/log/elasticsearch
 
 # ----------------------------------- Memory -----------------------------------
-bootstrap.mlockall: LOCK_MEMORY
+bootstrap.memory_lock: LOCK_MEMORY
 
 # ---------------------------------- Network -----------------------------------
 network.host: NETWORK_HOST
 
 # --------------------------------- Discovery ----------------------------------
-discovery.zen.ping.unicast.hosts: UNICAST_HOSTS
-discovery.zen.minimum_master_nodes: MINIMUM_MASTER_NODES
+#discovery.zen.ping.unicast.hosts: UNICAST_HOSTS
+#discovery.zen.minimum_master_nodes: MINIMUM_MASTER_NODES
