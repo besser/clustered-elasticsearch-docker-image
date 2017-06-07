@@ -17,11 +17,17 @@ sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/
   s/UNICAST_HOSTS/$UNICAST_HOSTS/
   s/MINIMUM_MASTER_NODES/$MINIMUM_MASTER_NODES/" ./config/elasticsearch.yml
 
-#while true
-#do
-#    echo "Press [CTRL+C] to stop..."
-#    sleep 1
-#done
+#echo -e "Starting Elasticsearch $ELASTICSEARCH_VERSION"
+#exec /opt/elasticsearch/bin/elasticsearch
 
-echo -e "Starting Elasticsearch $ELASTICSEARCH_VERSION"
-exec /opt/elasticsearch/bin/elasticsearch
+#echo -e "Starting Kibana... "
+#exec /opt/kibana/bin/kibana
+
+#echo -e "Starting Logstash... "
+#exec /opt/logstash/bin/logstash -f /opt/logstash/conf/logstash.conf
+
+while true
+do
+    echo "Press [CTRL+C] to stop..."
+    sleep 1
+done
