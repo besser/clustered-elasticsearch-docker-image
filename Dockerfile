@@ -1,6 +1,6 @@
 ############################################################
 # Dockerfile to build Elasticsearch 3.4.2 environment
-# Based on baseImage
+# Based on baseImage elk
 ############################################################
 
 # Set the base image to openjdk:8-jre
