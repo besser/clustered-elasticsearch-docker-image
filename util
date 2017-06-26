@@ -4,23 +4,68 @@ docker rm $(docker ps -a -q)
 
 docker build -t godois/elasticsearch-clustered:1.0 .
 
-docker run -d -it --name elasticsearch \
-    --net=host \
+docker network create --subnet=192.170.0.0/16 elasticsearch-net
+
+docker run -d -it --name elasticsearch-node1 \
     --privileged \
-    -p 9200-9400:9200-9400 \
+    --ulimit memlock=-1:-1 \
+    --ulimit nofile=65536:65536 \
+    --net elasticsearch-net \
+    --ip 192.170.1.1 \
+    --hostname="elastisearch-node1.example.com" \
+    --add-host elastisearch-node2.example.com:192.170.1.2 \
+    --add-host elastisearch-node3.example.com:192.170.1.3 \
+    -p 9201:9200 \
     -p 5601:5601 \
-    -e "http.host=0.0.0.0" \
-    -e "transport.host=127.0.0.1" \
     -e CLUSTER_NAME=sage-content \
     -e NODE_NAME=sage-content-node1 \
     -e IS_MASTER_ELEGIBLE_NODE=yes \
     -e IS_DATA_NODE=yes \
     -e LOCK_MEMORY=true \
-    --ulimit memlock=-1:-1 \
-    --ulimit nofile=65536:65536 \
     godois/elasticsearch-clustered:1.0
 
-    -e NETWORK_HOST=127.0.0.1 \
+
+docker run -d -it --name elasticsearch-node2 \
+    --privileged \
+    --ulimit memlock=-1:-1 \
+    --ulimit nofile=65536:65536 \
+    --net elasticsearch-net \
+    --ip 192.170.1.2 \
+    --hostname="elastisearch-node2.example.com" \
+    --add-host elastisearch-node1.example.com:192.170.1.1 \
+    --add-host elastisearch-node3.example.com:192.170.1.3 \
+    -p 9202:9200   \
+    -p 5602:5601 \
+    -e "http.host=0.0.0.0" \
+    -e "transport.host=127.0.0.1" \
+    -e CLUSTER_NAME=sage-content \
+    -e NODE_NAME=sage-content-node2 \
+    -e IS_MASTER_ELEGIBLE_NODE=no \
+    -e IS_DATA_NODE=yes \
+    -e LOCK_MEMORY=true \
+    godois/elasticsearch-clustered:1.0
+
+
+docker run -d -it --name elasticsearch-node3 \
+    --privileged \
+    --ulimit memlock=-1:-1 \
+    --ulimit nofile=65536:65536 \
+    --net elasticsearch-net \
+    --ip 192.170.1.3 \
+    --hostname="elastisearch-node3.example.com" \
+    --add-host elastisearch-node1.example.com:192.170.1.1 \
+    --add-host elastisearch-node2.example.com:192.170.1.2 \
+    -p 9200-9400:9200-9400 \
+    -p 5601:5601 \
+    -e "http.host=0.0.0.0" \
+    -e "transport.host=127.0.0.1" \
+    -e CLUSTER_NAME=sage-content \
+    -e NODE_NAME=sage-content-node3 \
+    -e IS_MASTER_ELEGIBLE_NODE=no \
+    -e IS_DATA_NODE=yes \
+    -e LOCK_MEMORY=true \
+    godois/elasticsearch-clustered:1.0
+
 
 docker exec -i -t  elasticsearch /bin/bash
 
