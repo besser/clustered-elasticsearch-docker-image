@@ -1,10 +1,10 @@
 
-docker kill $(docker ps -a -q)
-docker rm $(docker ps -a -q)
+docker kill $(docker ps -a -q) && docker rm $(docker ps -a -q)
 
 docker build -t godois/elasticsearch-clustered:1.0 .
 
 docker network create --subnet=192.170.0.0/16 elasticsearch-net
+
 
 docker run -d -it --name elasticsearch-node1 \
     --privileged \
@@ -15,6 +15,7 @@ docker run -d -it --name elasticsearch-node1 \
     --hostname="elastisearch-node1.example.com" \
     --add-host elastisearch-node2.example.com:192.170.1.2 \
     --add-host elastisearch-node3.example.com:192.170.1.3 \
+    -p 9001:9000 \
     -p 9201:9200 \
     -p 5601:5601 \
     -e CLUSTER_NAME=sage-content \
@@ -22,6 +23,8 @@ docker run -d -it --name elasticsearch-node1 \
     -e IS_MASTER_ELEGIBLE_NODE=yes \
     -e IS_DATA_NODE=yes \
     -e LOCK_MEMORY=true \
+    -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
+    -e DISCOVERY_HOSTS="[\"elastisearch-node1.example.com\",\"elastisearch-node2.example.com\",\"elastisearch-node3.example.com\"]" \
     godois/elasticsearch-clustered:1.0
 
 
@@ -34,15 +37,16 @@ docker run -d -it --name elasticsearch-node2 \
     --hostname="elastisearch-node2.example.com" \
     --add-host elastisearch-node1.example.com:192.170.1.1 \
     --add-host elastisearch-node3.example.com:192.170.1.3 \
+    -p 9002:9000 \
     -p 9202:9200   \
     -p 5602:5601 \
-    -e "http.host=0.0.0.0" \
-    -e "transport.host=127.0.0.1" \
     -e CLUSTER_NAME=sage-content \
     -e NODE_NAME=sage-content-node2 \
-    -e IS_MASTER_ELEGIBLE_NODE=no \
+    -e IS_MASTER_ELEGIBLE_NODE=yes \
     -e IS_DATA_NODE=yes \
     -e LOCK_MEMORY=true \
+    -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
+    -e DISCOVERY_HOSTS="[\"elastisearch-node1.example.com\",\"elastisearch-node2.example.com\",\"elastisearch-node3.example.com\"]" \
     godois/elasticsearch-clustered:1.0
 
 
@@ -55,21 +59,34 @@ docker run -d -it --name elasticsearch-node3 \
     --hostname="elastisearch-node3.example.com" \
     --add-host elastisearch-node1.example.com:192.170.1.1 \
     --add-host elastisearch-node2.example.com:192.170.1.2 \
-    -p 9200-9400:9200-9400 \
-    -p 5601:5601 \
-    -e "http.host=0.0.0.0" \
-    -e "transport.host=127.0.0.1" \
+    -p 9203:9200   \
+    -p 5603:5601 \
     -e CLUSTER_NAME=sage-content \
     -e NODE_NAME=sage-content-node3 \
-    -e IS_MASTER_ELEGIBLE_NODE=no \
+    -e IS_MASTER_ELEGIBLE_NODE=yes \
     -e IS_DATA_NODE=yes \
     -e LOCK_MEMORY=true \
+    -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
+    -e DISCOVERY_HOSTS="[\"elastisearch-node1.example.com\",\"elastisearch-node2.example.com\",\"elastisearch-node3.example.com\"]" \
     godois/elasticsearch-clustered:1.0
 
 
-docker exec -i -t  elasticsearch /bin/bash
+docker exec -i -t  elasticsearch-node1 /bin/bash
 
-docker logs -f elasticsearch
+docker exec -i -t  elasticsearch-node2 /bin/bash
+
+docker exec -i -t  elasticsearch-node3 /bin/bash
+
+watch docker logs -f elasticsearch-node1
+
+watch docker logs -f elasticsearch-node2
+
+watch docker logs -f elasticsearch-node3
+
+exec /opt/elasticsearch/bin/elasticsearch
+
+exec /opt/cerebro/bin/cerebro
+
 
 
 docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:5.3.0
