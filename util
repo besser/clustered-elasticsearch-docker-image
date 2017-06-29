@@ -15,7 +15,6 @@ docker run -d -it --name elasticsearch-node1 \
     --hostname="elastisearch-node1.example.com" \
     --add-host elastisearch-node2.example.com:192.170.1.2 \
     --add-host elastisearch-node3.example.com:192.170.1.3 \
-    -p 9001:9000 \
     -p 9201:9200 \
     -p 5601:5601 \
     -e CLUSTER_NAME=sage-content \
