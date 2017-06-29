@@ -1,19 +1,98 @@
-version: '2'
+version: '3.2'
 services:
-	elastic-1:
-		image: "godois/clustered-elasticsearch-docker-image"
-		ports:
-			- "9201:9200"
-			- "5601:5601"
-		environment:
-		    - CLUSTER_NAME: "sage-content"
-		    - NODE_NAME: "sage-content-node1"
-		    - IS_MASTER_ELEGIBLE_NODE: "yes"
-		    - IS_DATA_NODE: "yes"
-		    - LOCK_MEMORY: "true"
-			- ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-			- CLUSTER_NAME: "sage-content"
-			- DISCOVERY_HOSTS: "[\"elastisearch-node1.example.com\",\"elastisearch-node2.example.com\",\"elastisearch-node3.example.com\"]"
-        extra_hosts:
-            - "elastisearch-node3.example.com:192.170.1.3"
-            - "elastisearch-node2.example.com:192.170.1.2"
+  elasticsearch-1:
+    container_name: "elasticsearch-node1"
+    privileged: true
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+      memlock:
+        soft: -1
+        hard: -1
+    network_mode: "elasticsearch-net"
+    ipc: 192.170.1.1
+    hostname: "elastisearch-node1.example.com"
+    image: "godois/elasticsearch-clustered:1.0"
+    ports:
+      - "9201:9200"
+      - "5601:5601"
+    extra_hosts:
+      - "elastisearch-node3.example.com:192.170.1.3"
+      - "elastisearch-node2.example.com:192.170.1.2"
+    environment:
+      - CLUSTER_NAME="sage-content"
+      - NODE_NAME="sage-content-node1"
+      - IS_MASTER_ELEGIBLE_NODE="yes"
+      - IS_DATA_NODE="yes"
+      - LOCK_MEMORY="true"
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - DISCOVERY_HOSTS=[\"elastisearch-node1.example.com\",\"elastisearch-node2.example.com\",\"elastisearch-node3.example.com\"]
+  elasticsearch-2:
+    container_name: "elasticsearch-node2"
+    privileged: true
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+      memlock:
+        soft: -1
+        hard: -1
+    network_mode: "elasticsearch-net"
+    ipc: 192.170.1.2
+    hostname: "elastisearch-node2.example.com"
+    image: "godois/elasticsearch-clustered:1.0"
+    ports:
+      - "9202:9200"
+      - "5602:5601"
+    extra_hosts:
+      - "elastisearch-node1.example.com:192.170.1.1"
+      - "elastisearch-node3.example.com:192.170.1.3"
+    environment:
+      - CLUSTER_NAME="sage-content"
+      - NODE_NAME="sage-content-node2"
+      - IS_MASTER_ELEGIBLE_NODE="yes"
+      - IS_DATA_NODE="yes"
+      - LOCK_MEMORY="true"
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - DISCOVERY_HOSTS=[\"elastisearch-node1.example.com\",\"elastisearch-node2.example.com\",\"elastisearch-node3.example.com\"]
+  elasticsearch-3:
+    container_name: "elasticsearch-node3"
+    privileged: true
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+      memlock:
+        soft: -1
+        hard: -1
+    network_mode: "elasticsearch-net"
+    ipc: 192.170.1.2
+    hostname: "elastisearch-node3.example.com"
+    image: "godois/elasticsearch-clustered:1.0"
+    ports:
+      - "9203:9200"
+      - "5603:5601"
+    extra_hosts:
+      - "elastisearch-node1.example.com:192.170.1.1"
+      - "elastisearch-node2.example.com:192.170.1.2"
+    environment:
+      - CLUSTER_NAME="sage-content"
+      - NODE_NAME="sage-content-node3"
+      - IS_MASTER_ELEGIBLE_NODE="yes"
+      - IS_DATA_NODE="yes"
+      - LOCK_MEMORY="true"
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - DISCOVERY_HOSTS=[\"elastisearch-node1.example.com\",\"elastisearch-node2.example.com\",\"elastisearch-node3.example.com\"]
+  cerebro:
+    container_name: "cerebro-admin"
+    network_mode: "elasticsearch-net"
+    ipc: 192.170.1.10
+    hostname: "cerebro-admin.example.com"
+    image: "godois/cerebro:1.0"
+    ports:
+      - "9001:9000"
+    extra_hosts:
+      - "elastisearch-node1.example.com:192.170.1.1"
+      - "elastisearch-node2.example.com:192.170.1.2"
+      - "elastisearch-node3.example.com:192.170.1.3"
