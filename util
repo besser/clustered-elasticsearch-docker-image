@@ -5,6 +5,7 @@ docker build -t godois/elasticsearch-clustered:1.0 .
 
 docker network create --subnet=192.170.0.0/16 elasticsearch-net
 
+docker network rm elasticsearch-net
 
 docker run -d -it --name elasticsearch-node1 \
     --privileged \
@@ -76,11 +77,11 @@ docker exec -i -t  elasticsearch-node2 /bin/bash
 
 docker exec -i -t  elasticsearch-node3 /bin/bash
 
-watch docker logs -f elasticsearch-node1
+docker logs -f elasticsearch-node1
 
-watch docker logs -f elasticsearch-node2
+docker logs -f elasticsearch-node2
 
-watch docker logs -f elasticsearch-node3
+docker logs -f elasticsearch-node3
 
 exec /opt/elasticsearch/bin/elasticsearch
 
