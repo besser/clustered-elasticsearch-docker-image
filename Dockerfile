@@ -11,13 +11,10 @@ MAINTAINER Marcio Godoi <souzagodoi@gmail.com>
 # Run as a root user
 USER root
 
+#Setting some environment variables up
 ENV ELASTICSEARCH_VERSION 5.4.1
 ENV ELASTICSEARCH_DEB_VERSION 5.4.1
 ENV ELASTICSEARCH_HOME=/opt/elasticsearch
-ENV KIBANA_HOME=/opt/kibana
-ENV LOGSTASH_HOME=/opt/logstash
-
-USER root
 
 # Installing sudo module to support Logstash installation
 RUN apt-get update && \
@@ -30,6 +27,7 @@ RUN wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.4.
   mv /tmp/elasticsearch/elasticsearch-5.4.1 $ELASTICSEARCH_HOME && \
   rm -rf /tmp/elasticsearch
 
+#Changing the path to HOME
 WORKDIR "$ELASTICSEARCH_HOME"
 
 # Install Elasticsearch monitoring plugins
@@ -45,19 +43,22 @@ RUN mkdir -p /var/log/elasticsearch
 RUN groupadd -g 1000 elasticsearch \
   && useradd -d "$ELASTICSEARCH_HOME" -u 1000 -g 1000 -s /sbin/nologin elasticsearch
 
+#Adding a entrypoint file to inside the image
 ADD bin/entrypoint.sh /opt/elasticsearch/bin/docker-entrypoint.sh
 
+#Adding a configuration file to inside the image
 ADD config/elasticsearch.yml /opt/elasticsearch/config/elasticsearch.yml
 
+#Changing the permission of the .sh entrypoint file to allow execution
 RUN chmod 755 /opt/elasticsearch/bin/docker-entrypoint.sh
 
+#Changing the owner for config data and log folders
 RUN chown -R elasticsearch:elasticsearch /opt/elasticsearch/config/ /var/data/elasticsearch /var/log/elasticsearch /opt/cerebro/
 
 # Run the container as elasticsearch user
 USER elasticsearch
 
-WORKDIR "$ELASTICSEARCH_HOME"
-
+#Entrypoint file for this image
 ENTRYPOINT ["/opt/elasticsearch/bin/docker-entrypoint.sh"]
 
 # Exposes http ports
